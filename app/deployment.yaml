@@ -1,0 +1,110 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-conf-file
+  labels:
+    app: nginx
+data:
+  nginx.conf: |
+    upstream redblue{
+      server localhost:8002;
+      server localhost:8003;
+    }
+    
+    server {
+    
+      listen 80;
+      root /var/www/html;
+      index index.html index.htm index.nginx-debian.html;
+      server_name localhost;
+      location / {
+        try_files $uri/index.html $uri/ =404;
+      }
+      location /content/ {
+        proxy_pass  http://localhost:8005/;
+      }
+      location /redblue/{
+        proxy_pass http://redblue/;
+      }
+      
+    }
+    
+    server {
+      server_name localhost;
+      root /var/www/html;
+      listen 8005;
+      location / {
+        try_files $uri/content.html $uri/ =404;
+      }
+    }
+    
+    server {
+      root /var/www/html;
+      listen 8002;
+      location / {
+        try_files $uri/red.jpg $uri/ =404;
+      }
+    }
+    
+    server {
+      root /var/www/html;
+      listen 8003;
+      location / {
+        try_files $uri/blue.jpg $uri/ =404;
+      }
+    }
+
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-proxy
+spec:
+  selector:
+    matchLabels:
+      app: nginx
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+        - name: nginx
+          image: nginx
+          ports:
+          - containerPort: 80
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /content/
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          startupProbe:
+            httpGet:
+              path: /
+              port: 80
+            periodSeconds: 10
+            failureThreshold: 30         
+          volumeMounts:
+            - name: nginx-conf
+              mountPath: /etc/nginx/conf.d/
+              readOnly: true
+            - name: main-data
+              mountPath: /var/www/html/
+              readOnly: true
+      volumes:
+        - name: nginx-conf
+          configMap:
+            name: nginx-conf-file
+        - name: main-data
+          configMap:
+            name: main-data
