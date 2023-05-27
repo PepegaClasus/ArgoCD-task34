@@ -1,11 +1,11 @@
-# apiVersion: kustomize.config.k8s.io/v1beta1
-# kind: Kustomization
-# resources:
-# - deployment.yaml
-# - service.yaml
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- deployment.yaml
+- service.yaml
 
-# generators:
-#   - ./kops-secret.yaml
+generators:
+  - ./kops-secret.yaml
 # configMapGenerator:
 # - name: myconfig
 #   files:
@@ -14,15 +14,15 @@
 
 
 
-apiVersion: kustomize.config.k8s.io/v1beta1
-kind: Kustomization
-resources:
-  - deployment.yaml
-  - service.yaml
-configMapGenerator:
-- name: myconfig
-  files:
-  - secret/encrypt-config.yaml 
+# apiVersion: kustomize.config.k8s.io/v1beta1
+# kind: Kustomization
+# resources:
+#   - deployment.yaml
+#   - service.yaml
+# configMapGenerator:
+# - name: myconfig
+#   files:
+#   - secret/encrypt-config.yaml 
 
 
 
