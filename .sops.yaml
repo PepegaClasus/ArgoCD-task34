@@ -1,3 +1,0 @@
-creation_rules:
-  - encrypted_regex: '^(data)$'
-    pgp: B523140C171F746C8788F25DB5F84F1204724553
