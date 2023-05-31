@@ -3,10 +3,10 @@ kind: Service
 metadata:
   name: my-service
 spec:
-  type: NodePort
+  type: {{ .Values.service.nginx_service }}
   selector:
     app: nginx
   ports:
-    - port: 80
-      targetPort: 80
+    - port: {{ .Values.service.nginx_port }}
+      targetPort: {{ .Values.service.nginx_port }}
       nodePort: 30007

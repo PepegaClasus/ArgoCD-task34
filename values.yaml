@@ -1,0 +1,5 @@
+image:
+  nginx: nginx:latest
+service:
+  nginx_service: NodePort
+  nginx_port: 80
